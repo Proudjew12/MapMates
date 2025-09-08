@@ -1,0 +1,31 @@
+.main-layout {
+    display: grid;
+    grid-template-columns: minmax(16px, 1fr) minmax(0, 980px) minmax(16px, 1fr);
+    column-gap: 0;
+}
+
+.main-layout>*:not(.full) {
+    grid-column: 2;
+}
+
+.main-layout>.full {
+    grid-column: 1 / -1;
+}
+
+
+.cards-layout {
+    padding-inline: 0;
+    border: none;
+}
+
+
+.card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.grid-only {
+    grid-column: 1 / -1;
+}

@@ -1,0 +1,57 @@
+:root {
+    --bg1: darkslateblue;
+    --bg2: darkorchid;
+    --bg3: darkmagenta;
+    --color1: aliceblue;
+    --color2: deeppink;
+    --color3: gold;
+    --color4: goldenrod;
+    --gray1: lightgray;
+}
+
+/* basic */
+/*:root {
+ * --clr-primary: #0a4283;
+ * --clr-primary-light: #1260b8;
+ * --clr-primary-dark: #062d5b;
+ *
+ * --clr-secondary: #f39c12;
+ * --clr-accent: #e74c3c;
+ *
+ * --clr-bg: #fff;
+ * --clr-bg-alt: #f4f4f4;
+ *
+ * --clr-text: #222;
+ * --clr-text-light: #666;
+ * --clr-text-invert: #fff;
+ *
+ * --space-xs: 4px;
+ * --space-sm: 8px;
+ * --space-md: 16px;
+ * --space-lg: 32px;
+ * --space-xl: 64px;
+ *
+ * --s: 600px;
+ * --m: 890px;
+ * --l: 1060px;
+ *
+ * --transition-fast: .2s ease;
+ * --transition-medium: .4s ease;
+ * --transition-slow: .6s ease;
+ *
+ * --bg-gradient-dark:
+ *     radial-gradient(circle at center, #2a2b30 0%, #1a1b1f 70%),
+ *     repeating-conic-gradient(rgba(255, 255, 255, .02) 0deg 10deg, transparent 10deg 20deg);
+ } */
+
+/* Another theme */
+/* :root {
+ * --bg1: rgb(37, 13, 195);
+ * --bg2: rgb(26, 110, 146);
+ * --bg3: rgb(9, 49, 226);
+ * --color1: aliceblue;
+ * --color2: rgb(94, 169, 240);
+ * --color3: rgb(211, 187, 48);
+ * --color4: rgb(90, 66, 6);
+ * --gray1: lightgray;
+ } */

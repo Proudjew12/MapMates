@@ -1,0 +1,101 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: lato-regular, sans-serif;
+    line-height: 1.25;
+    font-size: 16px;
+    color: var(--clr-text);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: var(--bg1);
+    background-image: var(--bg-gradient-dark);
+    color: #eee;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+a {
+    color: var(--clr-primary, #0a4283);
+    text-decoration: none;
+}
+
+a:hover,
+a:focus {
+    text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0 0 1em;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+p {
+    margin: 0 0 1em;
+}
+
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+header {
+    background-color: var(--bg2);
+    color: aliceblue;
+    padding: 0.3em;
+}
+
+header h1 {
+    margin: 0;
+}
+
+input[type=text],
+input[type=number] {
+    line-height: 2em;
+    background-color: var(--color1);
+    border: 0;
+}
+
+button {
+    color: whitesmoke;
+    border: 0;
+    border-radius: .2em;
+    background-color: #222;
+    padding: 6px 10px;
+    margin: 2px;
+    cursor: pointer;
+    transition: background-color .5s;
+}
+
+button:hover {
+    color: var(--color2);
+    background-color: #111;
+}
+
+.muted {
+    font-size: .9em;
+    color: var(--gray1);
+}
+
+.smaller {
+    font-size: .8em;
+}

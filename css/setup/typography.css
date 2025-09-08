@@ -1,0 +1,39 @@
+@font-face {
+    font-family: "Eurofurence";
+    src: url("/fonts/eurofurence/eurofurence-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Lato Bold";
+    src: url("/fonts/lato/Lato-Bold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Lato Regular";
+    src: url("/fonts/lato/Lato-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Anton";
+    src: url("/fonts/Anton/Anton-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Bangers";
+    src: url("/fonts/Bangers/Bangers-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Luckiest Guy";
+    src: url("/fonts/Luckiest_Guy/LuckiestGuy-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Fjalla One";
+    src: url("/fonts/Fjalla_One/FjallaOne-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Font Awesome Brands";
+    src: url("/fonts/fa/fa-brands-400.woff2") format("woff2");
+}
