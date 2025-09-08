@@ -87,5 +87,5 @@ window.app = {
 - [OpenStreetMap + Nominatim](https://nominatim.openstreetmap.org/) for geocoding  
 - Vanilla JS + Local Storage  
 
-## 📸 Demo / Screenshots  
-_Add screenshots or GIFs of your app here to show how it looks in action!_
+## 🚀 Try It Live  
+👉 [**Click here to try the app**](https://proudjew12.github.io/MapMates/)  
