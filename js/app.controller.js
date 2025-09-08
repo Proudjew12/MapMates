@@ -5,16 +5,12 @@ import { appService } from './services/app.service.js'
 
 window.onload = onInit
 
-// To make things easier in this project structure 
-// functions that are called from DOM are defined on a global app object
 window.app = {
     onRemoveLoc,
     onUpdateLoc,
     onSelectLoc,
     onPanToUserPos,
     onSearchAddress,
-    onCopyLoc,
-    onShareLoc,
     onSetSortBy,
     onSetFilterBy,
 }
@@ -24,59 +20,53 @@ function onInit() {
     loadAndRenderLocs()
     mapService.initMap()
         .then(() => {
-            // onPanToTokyo()
             mapService.addClickListener(onAddLoc)
         })
         .catch(err => {
             console.error('OOPs:', err)
-            flashMsg('Cannot init map')
+            appService.flashMsg('Cannot init map', 'error')
         })
 }
 
 function renderLocs(locs) {
     const selectedLocId = getLocIdFromQueryParams()
-
-    var strHTML = locs.map(loc => {
+    const strHTML = locs.map(loc => {
         const className = (loc.id === selectedLocId) ? 'active' : ''
         return `
         <li class="loc ${className}" data-id="${loc.id}">
-            <h4>  
+            <h4>
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
-                ${(loc.createdAt !== loc.updatedAt) ?
-                ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}`
+                ${(loc.createdAt !== loc.updatedAt)
+                ? ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}`
                 : ''}
             </p>
-            <div class="loc-btns">     
-               <button title="Delete" onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
-               <button title="Edit" onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
-               <button title="Select" onclick="app.onSelectLoc('${loc.id}')">🗺️</button>
-            </div>     
-        </li>`}).join('')
+            <div class="loc-btns">
+                <button onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
+                <button onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
+                <button onclick="app.onSelectLoc('${loc.id}')">🗺️</button>
+            </div>
+        </li>`
+    }).join('')
 
-    const elLocList = document.querySelector('.loc-list')
-    elLocList.innerHTML = strHTML || 'No locs to show'
-
+    document.querySelector('.loc-list').innerHTML = strHTML || 'No locs to show'
     renderLocStats()
 
     if (selectedLocId) {
         const selectedLoc = locs.find(loc => loc.id === selectedLocId)
-        displayLoc(selectedLoc)
+        if (selectedLoc) onSelectLoc(selectedLoc.id)
     }
-    document.querySelector('.debug').innerText = JSON.stringify(locs, null, 2)
 }
 
 async function onRemoveLoc(locId) {
     const ok = await appService.confirm("Do you really want to delete this location?")
     if (!ok) return
-
     try {
         await locService.remove(locId)
         appService.flashMsg('Location removed', 'success')
-        unDisplayLoc()
         loadAndRenderLocs()
     } catch (err) {
         console.error('OOPs:', err)
@@ -88,34 +78,41 @@ function onSearchAddress(ev) {
     ev.preventDefault()
     const el = document.querySelector('[name=address]')
     mapService.lookupAddressGeo(el.value)
-        .then(geo => {
-            mapService.panTo(geo)
-        })
+        .then(geo => mapService.panTo(geo))
         .catch(err => {
             console.error('OOPs:', err)
-            flashMsg('Cannot lookup address')
+            appService.flashMsg('Cannot lookup address', 'error')
         })
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
-
-    const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
-    }
-    locService.save(loc)
-        .then((savedLoc) => {
-            flashMsg(`Added Location (id: ${savedLoc.id})`)
+    Swal.fire({
+        title: 'Add Location',
+        html: `
+            <input id="swal-input-name" class="swal2-input" placeholder="Location name" value="${geo.address || ''}">
+            <input id="swal-input-rate" type="number" min="1" max="5" class="swal2-input" value="3">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        preConfirm: () => ({
+            name: document.getElementById('swal-input-name').value,
+            rate: +document.getElementById('swal-input-rate').value
+        })
+    }).then(async result => {
+        if (!result.value) return
+        const loc = { name: result.value.name, rate: result.value.rate, geo }
+        try {
+            const savedLoc = await locService.save(loc)
             utilService.updateQueryParams({ locId: savedLoc.id })
+            mapService.panTo(savedLoc.geo)
+            mapService.setMarker(savedLoc)
             loadAndRenderLocs()
-        })
-        .catch(err => {
+            displayLoc(savedLoc)
+        } catch (err) {
             console.error('OOPs:', err)
-            flashMsg('Cannot add location')
-        })
+            appService.flashMsg('Cannot add location', 'error')
+        }
+    })
 }
 
 function loadAndRenderLocs() {
@@ -123,7 +120,7 @@ function loadAndRenderLocs() {
         .then(renderLocs)
         .catch(err => {
             console.error('OOPs:', err)
-            flashMsg('Cannot load locations')
+            appService.flashMsg('Cannot load locations', 'error')
         })
 }
 
@@ -131,13 +128,11 @@ function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
             mapService.panTo({ ...latLng, zoom: 15 })
-            unDisplayLoc()
-            loadAndRenderLocs()
-            flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
+            appService.flashMsg(`You are at Latitude: ${latLng.lat}, Longitude: ${latLng.lng}`, 'info')
         })
         .catch(err => {
             console.error('OOPs:', err)
-            flashMsg('Cannot get your position')
+            appService.flashMsg('Cannot get your position', 'error')
         })
 }
 
@@ -146,112 +141,54 @@ function onUpdateLoc(locId) {
         .then(loc => {
             const rate = prompt('New rate?', loc.rate)
             if (rate && rate !== loc.rate) {
-                loc.rate = rate
+                loc.rate = +rate
                 locService.save(loc)
                     .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
+                        appService.flashMsg(`Rate updated to ${savedLoc.rate}`, 'success')
                         loadAndRenderLocs()
                     })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
-
             }
         })
 }
 
 function onSelectLoc(locId) {
-    return locService.getById(locId)
-        .then(displayLoc)
+    locService.getById(locId)
+        .then(loc => {
+            utilService.updateQueryParams({ locId: loc.id })
+            mapService.panTo(loc.geo)
+            mapService.setMarker(loc)
+            displayLoc(loc)   // SweetAlert2 modal instead of selected-loc panel
+        })
         .catch(err => {
             console.error('OOPs:', err)
-            flashMsg('Cannot display this location')
+            appService.flashMsg('Cannot display location', 'error')
         })
 }
-
 function displayLoc(loc) {
-    document.querySelector('.loc.active')?.classList?.remove('active')
-    document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
-
-    mapService.panTo(loc.geo)
-    mapService.setMarker(loc)
-
-    const el = document.querySelector('.selected-loc')
-    el.querySelector('.loc-name').innerText = loc.name
-    el.querySelector('.loc-address').innerText = loc.geo.address
-    el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
-    el.querySelector('[name=loc-copier]').value = window.location
-    el.classList.add('show')
-
-    utilService.updateQueryParams({ locId: loc.id })
+    appService.showLocModal(loc)
 }
 
-function unDisplayLoc() {
-    utilService.updateQueryParams({ locId: '' })
-    document.querySelector('.selected-loc').classList.remove('show')
-    mapService.setMarker(null)
-}
-
-function onCopyLoc() {
-    const elCopy = document.querySelector('[name=loc-copier]')
-    elCopy.select()
-    elCopy.setSelectionRange(0, 99999) // For mobile devices
-    navigator.clipboard.writeText(elCopy.value)
-    flashMsg('Link copied, ready to paste')
-}
-
-function onShareLoc() {
-    const url = document.querySelector('[name=loc-copier]').value
-
-    // title and text not respected by any app (e.g. whatsapp)
-    const data = {
-        title: 'Cool location',
-        text: 'Check out this location',
-        url
-    }
-    navigator.share(data)
-}
-
-function flashMsg(msg) {
-    const el = document.querySelector('.user-msg')
-    el.innerText = msg
-    el.classList.add('open')
-    setTimeout(() => {
-        el.classList.remove('open')
-    }, 3000)
-}
 
 function getFilterByFromQueryParams() {
-    const queryParams = new URLSearchParams(window.location.search)
-    const txt = queryParams.get('txt') || ''
-    const minRate = queryParams.get('minRate') || 0
+    const params = new URLSearchParams(window.location.search)
+    const txt = params.get('txt') || ''
+    const minRate = params.get('minRate') || 0
     locService.setFilterBy({ txt, minRate })
-
-    document.querySelector('input[name="filter-by-txt"]').value = txt
-    document.querySelector('input[name="filter-by-rate"]').value = minRate
+    document.querySelector('[name="filter-by-txt"]').value = txt
+    document.querySelector('[name="filter-by-rate"]').value = minRate
 }
 
 function getLocIdFromQueryParams() {
-    const queryParams = new URLSearchParams(window.location.search)
-    const locId = queryParams.get('locId')
-    return locId
+    const params = new URLSearchParams(window.location.search)
+    return params.get('locId')
 }
 
 function onSetSortBy() {
     const prop = document.querySelector('.sort-by').value
     const isDesc = document.querySelector('.sort-desc').checked
-
     if (!prop) return
-
     const sortBy = {}
-    sortBy[prop] = (isDesc) ? -1 : 1
-
-    // Shorter Syntax:
-    // const sortBy = {
-    //     [prop] : (isDesc)? -1 : 1
-    // }
-
+    sortBy[prop] = isDesc ? -1 : 1
     locService.setSortBy(sortBy)
     loadAndRenderLocs()
 }
@@ -263,57 +200,28 @@ function onSetFilterBy({ txt, minRate }) {
 }
 
 function renderLocStats() {
-    locService.getLocCountByRateMap().then(stats => {
-        handleStats(stats, 'loc-stats-rate')
-    })
+    locService.getLocCountByRateMap().then(stats => handleStats(stats, 'loc-stats-rate'))
 }
 
 function handleStats(stats, selector) {
-    // stats = { low: 37, medium: 11, high: 100, total: 148 }
-    // stats = { low: 5, medium: 5, high: 5, baba: 55, mama: 30, total: 100 }
     const labels = cleanStats(stats)
     const colors = utilService.getColors()
-
-    var sumPercent = 0
-    var colorsStr = `${colors[0]} ${0}%, `
+    let sumPercent = 0
+    let colorsStr = `${colors[0]} 0%, `
     labels.forEach((label, idx) => {
         if (idx === labels.length - 1) return
         const count = stats[label]
         const percent = Math.round((count / stats.total) * 100, 2)
         sumPercent += percent
-        colorsStr += `${colors[idx]} ${sumPercent}%, `
-        if (idx < labels.length - 1) {
-            colorsStr += `${colors[idx + 1]} ${sumPercent}%, `
-        }
+        colorsStr += `${colors[idx]} ${sumPercent}%, ${colors[idx + 1]} ${sumPercent}%, `
     })
-
-    colorsStr += `${colors[labels.length - 1]} ${100}%`
-    // Example:
-    // colorsStr = `purple 0%, purple 33%, blue 33%, blue 67%, red 67%, red 100%`
-
-    const elPie = document.querySelector(`.${selector} .pie`)
-    const style = `background-image: conic-gradient(${colorsStr})`
-    elPie.style = style
-
-    const ledendHTML = labels.map((label, idx) => {
-        return `
-                <li>
-                    <span class="pie-label" style="background-color:${colors[idx]}"></span>
-                    ${label} (${stats[label]})
-                </li>
-            `
-    }).join('')
-
-    const elLegend = document.querySelector(`.${selector} .legend`)
-    elLegend.innerHTML = ledendHTML
+    colorsStr += `${colors[labels.length - 1]} 100%`
+    document.querySelector(`.${selector} .pie`).style = `background-image: conic-gradient(${colorsStr})`
+    document.querySelector(`.${selector} .legend`).innerHTML = labels.map((label, idx) =>
+        `<li><span class="pie-label" style="background-color:${colors[idx]}"></span>${label} (${stats[label]})</li>`
+    ).join('')
 }
 
 function cleanStats(stats) {
-    const cleanedStats = Object.keys(stats).reduce((acc, label) => {
-        if (label !== 'total' && stats[label]) {
-            acc.push(label)
-        }
-        return acc
-    }, [])
-    return cleanedStats
+    return Object.keys(stats).filter(label => label !== 'total' && stats[label])
 }

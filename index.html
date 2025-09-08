@@ -12,13 +12,6 @@
 <body>
     <header>
         <h1>TravelTip</h1>
-        <section class="selected-loc">
-            <h2>Location: <span class="loc-name"></span> <span class="loc-rate"></span></h2>
-            <h4 class="loc-address"></h4>
-            <button onclick="app.onCopyLoc()">Copy location</button>
-            <button onclick="app.onShareLoc()">Share location</button>
-            <input name="loc-copier" />
-        </section>
         <form class="form-search" onsubmit="app.onSearchAddress(event)">
             <input type="text" name="address" placeholder="Search address" />
             <button title="Search">🔍</button>
