@@ -13,11 +13,11 @@ let gMarker
 function initMap(lat = 32.0749831, lng = 34.9120554) {
     return new Promise((resolve) => {
         gMap = L.map(document.querySelector('.map'), {
-            zoomSnap: 0.25,           // smoother zoom increments
-            zoomDelta: 0.5,           // smaller zoom steps
-            wheelDebounceTime: 40,    // smoother scroll zoom
-            inertia: true,            // kinetic panning
-            inertiaDeceleration: 3000 // slows down stop after drag
+            zoomSnap: 0.25,
+            zoomDelta: 0.5,
+            wheelDebounceTime: 40,
+            inertia: true,
+            inertiaDeceleration: 3000
         }).setView([lat, lng], 13)
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

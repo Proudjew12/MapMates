@@ -1,6 +1,7 @@
 import { utilService } from './services/util.service.js'
 import { locService } from './services/loc.service.js'
 import { mapService } from './services/map.service.js'
+import { appService } from './services/app.service.js'
 
 window.onload = onInit
 
@@ -68,17 +69,19 @@ function renderLocs(locs) {
     document.querySelector('.debug').innerText = JSON.stringify(locs, null, 2)
 }
 
-function onRemoveLoc(locId) {
-    locService.remove(locId)
-        .then(() => {
-            flashMsg('Location removed')
-            unDisplayLoc()
-            loadAndRenderLocs()
-        })
-        .catch(err => {
-            console.error('OOPs:', err)
-            flashMsg('Cannot remove location')
-        })
+async function onRemoveLoc(locId) {
+    const ok = await appService.confirm("Do you really want to delete this location?")
+    if (!ok) return
+
+    try {
+        await locService.remove(locId)
+        appService.flashMsg('Location removed', 'success')
+        unDisplayLoc()
+        loadAndRenderLocs()
+    } catch (err) {
+        console.error('OOPs:', err)
+        appService.flashMsg('Cannot remove location', 'error')
+    }
 }
 
 function onSearchAddress(ev) {
@@ -223,7 +226,7 @@ function getFilterByFromQueryParams() {
     const queryParams = new URLSearchParams(window.location.search)
     const txt = queryParams.get('txt') || ''
     const minRate = queryParams.get('minRate') || 0
-    locService.setFilterBy({txt, minRate})
+    locService.setFilterBy({ txt, minRate })
 
     document.querySelector('input[name="filter-by-txt"]').value = txt
     document.querySelector('input[name="filter-by-rate"]').value = minRate
