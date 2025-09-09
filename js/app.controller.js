@@ -210,26 +210,34 @@ function onSetFilterBy({ txt, minRate }) {
 
 function renderLocStats() {
     locService.getLocCountByRateMap().then(stats => handleStats(stats, 'loc-stats-rate'))
+    locService.getLocCountByUpdatedMap().then(stats => handleStats(stats, 'loc-stats-updated'))
 }
+
 
 function handleStats(stats, selector) {
     const labels = cleanStats(stats)
-    const colors = utilService.getColors()
+    const baseColors = selector.includes('updated')
+        ? ['#00c9a7', '#ffd166', '#ff5c8a']
+        : utilService.getColors()
+
     let sumPercent = 0
-    let colorsStr = `${colors[0]} 0%, `
+    let colorsStr = `${baseColors[0]} 0%, `
     labels.forEach((label, idx) => {
         if (idx === labels.length - 1) return
         const count = stats[label]
-        const percent = Math.round((count / stats.total) * 100, 2)
+        const percent = Math.round((count / stats.total) * 100)
         sumPercent += percent
-        colorsStr += `${colors[idx]} ${sumPercent}%, ${colors[idx + 1]} ${sumPercent}%, `
+        colorsStr += `${baseColors[idx]} ${sumPercent}%, ${baseColors[idx + 1]} ${sumPercent}%, `
     })
-    colorsStr += `${colors[labels.length - 1]} 100%`
+    colorsStr += `${baseColors[labels.length - 1]} 100%`
+
     document.querySelector(`.${selector} .pie`).style = `background-image: conic-gradient(${colorsStr})`
     document.querySelector(`.${selector} .legend`).innerHTML = labels.map((label, idx) =>
-        `<li><span class="pie-label" style="background-color:${colors[idx]}"></span>${label} (${stats[label]})</li>`
+        `<li><span class="pie-label" style="background-color:${baseColors[idx]}"></span>${label} (${stats[label]})</li>`
     ).join('')
 }
+
+
 
 function cleanStats(stats) {
     return Object.keys(stats).filter(label => label !== 'total' && stats[label])
