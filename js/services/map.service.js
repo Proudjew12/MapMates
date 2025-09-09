@@ -1,8 +1,11 @@
+import { locService } from "./loc.service.js"
+
 export const mapService = {
     initMap,
     setMapTheme,
     getUserPosition,
     setMarker,
+    setMarkers,
     panTo,
     lookupAddressGeo,
     addClickListener
@@ -11,7 +14,7 @@ export const mapService = {
 let gMap
 let gTileLayer
 let gMarker
-
+let gMarkers = []
 function initMap(lat = 32.0749831, lng = 34.9120554) {
     return new Promise((resolve) => {
         gMap = L.map(document.querySelector('.map')).setView([lat, lng], 13)
@@ -32,7 +35,6 @@ function initMap(lat = 32.0749831, lng = 34.9120554) {
             L.DomEvent.disableClickPropagation(themeEl)
             L.DomEvent.disableScrollPropagation(themeEl)
         }
-
         resolve()
     })
 }
@@ -100,14 +102,19 @@ function addClickListener(cb) {
 
 
 function setMarker(loc) {
-    if (gMarker) gMap.removeLayer(gMarker)
     if (!loc) return
     gMarker = L.marker([loc.geo.lat, loc.geo.lng], { riseOnHover: true })
         .addTo(gMap)
         .bindPopup(loc.name)
         .openPopup()
+        gMarkers.push(gMarker)
 }
-
+function _removeMarkers(){
+gMarkers.forEach(marker => {
+        gMap.removeLayer(marker)
+    });
+    gMarkers = []
+}
 function getUserPosition() {
     return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
@@ -116,3 +123,10 @@ function getUserPosition() {
         )
     })
 }
+function setMarkers(locs){
+    _removeMarkers()
+locs.forEach(loc => {
+    setMarker(loc)
+});
+}
+

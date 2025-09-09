@@ -72,8 +72,12 @@ async function onRemoveLoc(locId) {
     const ok = await appService.confirm("Do you really want to delete this location?")
     if (!ok) return
     try {
+        locService.getById(locId)
+        .then(mapService.removeMarker)
         await locService.remove(locId)
         appService.flashMsg('Location removed', 'success')
+        
+        
         loadAndRenderLocs()
     } catch (err) {
         console.error('OOPs:', err)
@@ -129,6 +133,12 @@ function loadAndRenderLocs() {
             console.error('OOPs:', err)
             appService.flashMsg('Cannot load locations', 'error')
         })
+     locService.query()
+     .then(mapService.setMarkers)  
+     .catch(err => {
+            console.error('OOPs:', err)
+            appService.flashMsg('Cannot load locations', 'error')
+        }) 
 }
 
 function onPanToUserPos() {
@@ -244,7 +254,4 @@ function cleanStats(stats) {
 }
 function onSetMapTheme(theme) {
     mapService.setMapTheme(theme)
-}
-function foo(){
-
 }
