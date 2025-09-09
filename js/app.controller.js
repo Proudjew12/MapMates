@@ -245,3 +245,6 @@ function cleanStats(stats) {
 function onSetMapTheme(theme) {
     mapService.setMapTheme(theme)
 }
+function foo(){
+
+}
