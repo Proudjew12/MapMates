@@ -1,5 +1,6 @@
 export const mapService = {
     initMap,
+    setMapTheme,
     getUserPosition,
     setMarker,
     panTo,
@@ -8,53 +9,69 @@ export const mapService = {
 }
 
 let gMap
+let gTileLayer
 let gMarker
 
 function initMap(lat = 32.0749831, lng = 34.9120554) {
     return new Promise((resolve) => {
-        gMap = L.map(document.querySelector('.map'), {
-            zoomSnap: 0.25,
-            zoomDelta: 0.5,
-            wheelDebounceTime: 40,
-            inertia: true,
-            inertiaDeceleration: 3000
-        }).setView([lat, lng], 13)
+        gMap = L.map(document.querySelector('.map')).setView([lat, lng], 13)
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        gTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(gMap)
+
+        const formEl = document.querySelector('.form-search')
+        if (formEl) {
+            L.DomEvent.disableClickPropagation(formEl)
+            L.DomEvent.disableScrollPropagation(formEl)
+        }
+        const themeEl = document.querySelector('.theme-toggle')
+        if (themeEl) {
+            L.DomEvent.disableClickPropagation(themeEl)
+            L.DomEvent.disableScrollPropagation(themeEl)
+        }
 
         resolve()
     })
 }
 
+function setMapTheme(theme) {
+    if (gTileLayer) gMap.removeLayer(gTileLayer)
+
+    if (theme === 'dark') {
+        gTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(gMap)
+    } else {
+        gTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(gMap)
+    }
+}
+
 function panTo({ lat, lng, zoom = 15 }) {
-    // Smooth animated transition
-    gMap.flyTo([lat, lng], zoom, {
-        animate: true,
-        duration: 1.5 // in seconds
-    })
+    gMap.flyTo([lat, lng], zoom, { animate: true, duration: 1.5 })
 }
 
 async function lookupAddressGeo(geoOrAddress) {
     let url
     if (geoOrAddress.lat) {
-        // Reverse geocoding
         url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${geoOrAddress.lat}&lon=${geoOrAddress.lng}`
     } else {
-        // Forward geocoding
         url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(geoOrAddress)}`
     }
 
     const res = await fetch(url, { headers: { 'User-Agent': 'TravelTip App' } })
     const data = await res.json()
-
-    if (!data || (Array.isArray(data) && data.length === 0)) {
-        throw new Error('Not found')
-    }
+    if (!data || (Array.isArray(data) && data.length === 0)) throw new Error('Not found')
 
     const result = Array.isArray(data) ? data[0] : data
-
     return {
         address: result.display_name,
         lat: parseFloat(result.lat),
@@ -65,22 +82,27 @@ async function lookupAddressGeo(geoOrAddress) {
 
 function addClickListener(cb) {
     gMap.on('click', async (ev) => {
-        const geo = { lat: ev.latlng.lat, lng: ev.latlng.lng }
+        const geo = { lat: ev.latlng.lat, lng: ev.latlng.lng, address: 'Loading…' }
+
+        cb(geo)
+
         try {
             const data = await lookupAddressGeo(geo)
-            cb(data)
+            geo.address = data.address
+
+            const input = document.getElementById('swal-input-name')
+            if (input) input.value = geo.address
         } catch (err) {
             console.error('Geocoding failed', err)
         }
     })
 }
 
+
 function setMarker(loc) {
     if (gMarker) gMap.removeLayer(gMarker)
     if (!loc) return
-    gMarker = L.marker([loc.geo.lat, loc.geo.lng], {
-        riseOnHover: true
-    })
+    gMarker = L.marker([loc.geo.lat, loc.geo.lng], { riseOnHover: true })
         .addTo(gMap)
         .bindPopup(loc.name)
         .openPopup()
@@ -89,10 +111,8 @@ function setMarker(loc) {
 function getUserPosition() {
     return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-            },
-            (err) => reject(err)
+            pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+            err => reject(err)
         )
     })
 }

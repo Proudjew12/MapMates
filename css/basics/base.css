@@ -5,19 +5,20 @@
 }
 
 html {
-    font-family: lato-regular, sans-serif;
+    font-family: var(--font-body);
     line-height: 1.25;
     font-size: 16px;
-    color: var(--clr-text);
+    color: var(--color1);
 }
 
 body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    background-color: var(--bg1);
-    background-image: var(--bg-gradient-dark);
-    color: #eee;
+    background: var(--bg1);
+    background-image: var(--bg3);
+    color: var(--color1);
+    font-family: var(--font-body);
 }
 
 img {
@@ -27,8 +28,9 @@ img {
 }
 
 a {
-    color: var(--clr-primary, #0a4283);
+    color: var(--color2);
     text-decoration: none;
+    font-family: var(--font-body);
 }
 
 a:hover,
@@ -45,10 +47,12 @@ h6 {
     margin: 0 0 1em;
     text-transform: uppercase;
     line-height: 1.2;
+    font-family: var(--font-heading);
 }
 
 p {
     margin: 0 0 1em;
+    font-family: var(--font-body);
 }
 
 ul,
@@ -59,13 +63,15 @@ ol {
 }
 
 header {
-    background-color: var(--bg2);
-    color: aliceblue;
+    background: var(--bg2);
+    color: var(--color1);
     padding: 0.3em;
+    font-family: var(--font-heading);
 }
 
 header h1 {
     margin: 0;
+    font-family: var(--font-display);
 }
 
 input[type=text],
@@ -73,29 +79,34 @@ input[type=number] {
     line-height: 2em;
     background-color: var(--color1);
     border: 0;
+    color: var(--bg1);
+    font-family: var(--font-body);
 }
 
 button {
-    color: whitesmoke;
+    color: var(--color1);
     border: 0;
     border-radius: .2em;
-    background-color: #222;
+    background: var(--bg2);
     padding: 6px 10px;
     margin: 2px;
     cursor: pointer;
-    transition: background-color .5s;
+    transition: background .5s;
+    font-family: var(--font-heading);
 }
 
 button:hover {
     color: var(--color2);
-    background-color: #111;
+    background: var(--bg1);
 }
 
 .muted {
     font-size: .9em;
     color: var(--gray1);
+    font-family: var(--font-body);
 }
 
 .smaller {
     font-size: .8em;
+    font-family: var(--font-body);
 }

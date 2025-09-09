@@ -1,6 +1,8 @@
 import { utilService } from './util.service.js'
 import { storageService } from './async-storage.service.js'
 
+let gLocsCache = null
+
 // const sampleLoc = {
 //     id: 'GEouN',
 //     name: 'Dahab, Egypt',
@@ -44,7 +46,6 @@ function query() {
                 locs = locs.filter(loc => loc.rate >= gFilterBy.minRate)
             }
 
-            // No paging (unused)
             if (gPageIdx !== undefined) {
                 const startIdx = gPageIdx * PAGE_SIZE
                 locs = locs.slice(startIdx, startIdx + PAGE_SIZE)
@@ -64,9 +65,15 @@ function getById(locId) {
     return storageService.get(DB_KEY, locId)
 }
 
-function remove(locId) {
-    return storageService.remove(DB_KEY, locId)
+async function remove(locId) {
+    await storageService.remove(DB_KEY, locId)
+
+    const locs = await storageService.query(DB_KEY)
+    if (!locs.length) {
+        _createDemoLocs()
+    }
 }
+
 
 function save(loc) {
     if (loc.id) {

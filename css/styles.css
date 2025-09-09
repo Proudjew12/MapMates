@@ -7,5 +7,5 @@
 @import url(setup/vars.css);
 
 @import url(components/locs.css);
-@import url(components/selected-loc.css);
 @import url(components/user-msg.css);
+@import url(components/swal.css);

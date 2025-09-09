@@ -1,0 +1,65 @@
+.swal2-popup {
+    background: var(--bg2) !important;
+    border-radius: 1em !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+.swal2-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--color2);
+    margin-bottom: 0.5em;
+    text-transform: uppercase;
+}
+
+.swal2-html-container {
+    font-size: 1rem;
+    color: var(--color1);
+    opacity: 0.9;
+}
+
+.swal2-actions {
+    margin-top: 1.5em;
+    gap: 0.8em;
+}
+
+.swal2-confirm {
+    background: var(--color2) !important;
+    color: var(--bg1) !important;
+    border-radius: 0.4em !important;
+    padding: 0.6em 1.2em !important;
+    font-family: var(--font-heading);
+    transition: transform 0.2s, background 0.3s;
+}
+
+.swal2-confirm:hover {
+    background: var(--color3) !important;
+    transform: translateY(-2px);
+}
+
+.swal2-cancel {
+    background: var(--bg1) !important;
+    color: var(--color1) !important;
+    border: 1px solid var(--color2) !important;
+    border-radius: 0.4em !important;
+    padding: 0.6em 1.2em !important;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.swal2-cancel:hover {
+    background: var(--color2) !important;
+    color: var(--bg1) !important;
+    transform: translateY(-2px);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

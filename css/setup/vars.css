@@ -1,13 +1,25 @@
 :root {
-    --bg1: darkslateblue;
-    --bg2: darkorchid;
-    --bg3: darkmagenta;
-    --color1: aliceblue;
-    --color2: deeppink;
-    --color3: gold;
-    --color4: goldenrod;
-    --gray1: lightgray;
+    --bg1: #0e0e10;
+    --bg2: linear-gradient(135deg, #1f1c2c, #928dab);
+    --bg3: linear-gradient(135deg, #141e30, #243b55);
+
+    --color1: #f5f5f7;
+    --color2: #00c9a7;
+    --color3: #ff5c8a;
+    --color4: #ffd166;
+
+    --gray1: #a0a4b8;
+
+    --map-water: #1b263b;
+    --map-land: #161b2e;
+    --map-park: #14532d;
+    --map-road: #374151;
+    --map-border: #00c9a7;
 }
+
+
+
+
 
 /* basic */
 /*:root {

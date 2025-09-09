@@ -13,6 +13,7 @@ window.app = {
     onSearchAddress,
     onSetSortBy,
     onSetFilterBy,
+    onSetMapTheme,
 }
 
 function onInit() {
@@ -85,6 +86,8 @@ function onSearchAddress(ev) {
         })
 }
 
+
+
 function onAddLoc(geo) {
     Swal.fire({
         title: 'Add Location',
@@ -103,11 +106,9 @@ function onAddLoc(geo) {
         const loc = { name: result.value.name, rate: result.value.rate, geo }
         try {
             const savedLoc = await locService.save(loc)
-            utilService.updateQueryParams({ locId: savedLoc.id })
             mapService.panTo(savedLoc.geo)
             mapService.setMarker(savedLoc)
             loadAndRenderLocs()
-            displayLoc(savedLoc)
         } catch (err) {
             console.error('OOPs:', err)
             appService.flashMsg('Cannot add location', 'error')
@@ -154,10 +155,9 @@ function onUpdateLoc(locId) {
 function onSelectLoc(locId) {
     locService.getById(locId)
         .then(loc => {
-            utilService.updateQueryParams({ locId: loc.id })
             mapService.panTo(loc.geo)
             mapService.setMarker(loc)
-            displayLoc(loc)   // SweetAlert2 modal instead of selected-loc panel
+            displayLoc(loc)
         })
         .catch(err => {
             console.error('OOPs:', err)
@@ -194,9 +194,9 @@ function onSetSortBy() {
 }
 
 function onSetFilterBy({ txt, minRate }) {
-    const filterBy = locService.setFilterBy({ txt, minRate: +minRate })
-    utilService.updateQueryParams(filterBy)
+    locService.setFilterBy({ txt, minRate: +minRate })
     loadAndRenderLocs()
+
 }
 
 function renderLocStats() {
@@ -224,4 +224,7 @@ function handleStats(stats, selector) {
 
 function cleanStats(stats) {
     return Object.keys(stats).filter(label => label !== 'total' && stats[label])
+}
+function onSetMapTheme(theme) {
+    mapService.setMapTheme(theme)
 }
