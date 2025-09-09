@@ -16,6 +16,8 @@ window.app = {
     onSetMapTheme,
 }
 
+let gUserPos = null
+
 function onInit() {
     getFilterByFromQueryParams()
     loadAndRenderLocs()
@@ -39,12 +41,16 @@ function renderLocs(locs) {
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
-            <p class="muted">
-                Created: ${utilService.elapsedTime(loc.createdAt)}
-                ${(loc.createdAt !== loc.updatedAt)
+                <p class="muted">
+                 Created: ${utilService.elapsedTime(loc.createdAt)}
+                 ${(loc.createdAt !== loc.updatedAt)
                 ? ` | Updated: ${utilService.elapsedTime(loc.updatedAt)}`
                 : ''}
-            </p>
+                 ${gUserPos
+                ? ` | Distance: ${utilService.getDistance(gUserPos, loc.geo)} km`
+                : ''}
+                </p>
+
             <div class="loc-btns">
                 <button onclick="app.onRemoveLoc('${loc.id}')">🗑️</button>
                 <button onclick="app.onUpdateLoc('${loc.id}')">✏️</button>
@@ -128,14 +134,17 @@ function loadAndRenderLocs() {
 function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
+            gUserPos = latLng
             mapService.panTo({ ...latLng, zoom: 15 })
             appService.flashMsg(`You are at Latitude: ${latLng.lat}, Longitude: ${latLng.lng}`, 'info')
+            loadAndRenderLocs()
         })
         .catch(err => {
             console.error('OOPs:', err)
             appService.flashMsg('Cannot get your position', 'error')
         })
 }
+
 
 function onUpdateLoc(locId) {
     locService.getById(locId)

@@ -29,9 +29,13 @@ function flashMsg(msg, type = 'info', timeout = 2000) {
 }
 
 function showLocModal(loc) {
+    const distanceStr = (window.gUserPos)
+        ? `\nDistance: ${utilService.getDistance(window.gUserPos, loc.geo)} km`
+        : ''
+
     return Swal.fire({
         title: loc.name,
-        text: `${loc.geo.address}\nRated: ${'★'.repeat(loc.rate)}`,
+        text: `${loc.geo.address}\nRated: ${'★'.repeat(loc.rate)}${distanceStr}`,
         icon: 'info',
         showCancelButton: true,
         confirmButtonText: '📋 Copy Link',
@@ -87,4 +91,3 @@ function showLocModal(loc) {
         }
     })
 }
-
