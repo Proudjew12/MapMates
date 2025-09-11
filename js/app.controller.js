@@ -29,6 +29,8 @@ function onInit() {
             console.error('OOPs:', err)
             appService.flashMsg('Cannot init map', 'error')
         })
+        locService.query()
+        .then(mapService.setMarkers)
 }
 
 function renderLocs(locs) {
@@ -76,8 +78,6 @@ async function onRemoveLoc(locId) {
         .then(mapService.removeMarker)
         await locService.remove(locId)
         appService.flashMsg('Location removed', 'success')
-        
-        
         loadAndRenderLocs()
     } catch (err) {
         console.error('OOPs:', err)
@@ -133,12 +133,6 @@ function loadAndRenderLocs() {
             console.error('OOPs:', err)
             appService.flashMsg('Cannot load locations', 'error')
         })
-     locService.query()
-     .then(mapService.setMarkers)  
-     .catch(err => {
-            console.error('OOPs:', err)
-            appService.flashMsg('Cannot load locations', 'error')
-        }) 
 }
 
 function onPanToUserPos() {

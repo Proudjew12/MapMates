@@ -5,6 +5,7 @@ export const mapService = {
     setMapTheme,
     getUserPosition,
     setMarker,
+    removeMarker,
     setMarkers,
     panTo,
     lookupAddressGeo,
@@ -107,13 +108,13 @@ function setMarker(loc) {
         .addTo(gMap)
         .bindPopup(loc.name)
         .openPopup()
-        gMarkers.push(gMarker)
+        gMarkers.push(gMarker)        
 }
-function _removeMarkers(){
-gMarkers.forEach(marker => {
-        gMap.removeLayer(marker)
-    });
-    gMarkers = []
+function removeMarker(loc){
+const marker = gMarkers.find(marker=>(marker.getLatLng().lat === loc.geo.lat && marker.getLatLng().lng === loc.geo.lng))
+const idx = gMarkers.findIndex(marker=>(marker.getLatLng().lat === loc.geo.lat && marker.getLatLng().lng === loc.geo.lng))
+gMap.removeLayer(marker)
+gMarkers.splice(idx,1)
 }
 function getUserPosition() {
     return new Promise((resolve, reject) => {
@@ -124,7 +125,6 @@ function getUserPosition() {
     })
 }
 function setMarkers(locs){
-    _removeMarkers()
 locs.forEach(loc => {
     setMarker(loc)
 });
